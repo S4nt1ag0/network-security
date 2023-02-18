@@ -3,7 +3,7 @@ from egcd import egcd
 
 alphabet = np.array(
     ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
-     'X', 'Y', 'Z'])
+     'X', 'Y', 'Z', ' '])
 
 toInt = lambda char: np.where(alphabet == char.upper())[0][0]
 toChar = lambda int: alphabet[int]
@@ -12,13 +12,12 @@ toChar = lambda int: alphabet[int]
 def getInverse(key):
     inverseKey = np.linalg.inv(key)
     det = int(np.round(np.linalg.det(key)))
-    det_inv = egcd(det, 26)[1] % 26
-    result = (det_inv * np.round(det * inverseKey).astype(int) % 26)
+    det_inv = egcd(det, 27)[1] % 27
+    result = (det_inv * np.round(det * inverseKey).astype(int) % 27)
     return result
 
 
 def encrypt(plainText, key):
-    plainText = plainText.replace(" ", "")
     chars = list(plainText)
     arrayOfIndex = np.array(list(map(toInt, chars)))
     encryptText = ""
@@ -32,7 +31,7 @@ def encrypt(plainText, key):
         c = np.matmul(pairArray, key)
         if (hasProblem):
             c = np.delete(c, [1])
-        c = np.mod(c, 26)
+        c = np.mod(c, 27)
         c = np.array(list(map(toChar, c)))
         encryptText = encryptText + "".join(str(char) for char in c)
     return encryptText
@@ -52,7 +51,7 @@ def decrypt(encryptText, key):
             hasProblem = True
             pairArray = np.append(pairArray, 0)
         p = np.matmul(pairArray, inverseKey)
-        p = np.mod(p, 26)
+        p = np.mod(p, 27)
         if (hasProblem):
             p = np.delete(p, [1])
         p = np.array(list(map(toChar, p)))

@@ -1,55 +1,55 @@
-
-function encrypText(sampleText, key){
-    let encryptedText = ''
-    for (let i = 0; i < sampleText.length; i++) {
-        const letter = sampleText.charAt(i);
-        const value = letter.codePointAt(0);
-        let keyTemp = key
-        if(value >= 65 && value <= 90){
-            if( (value + keyTemp) > 90){
-                keyTemp -= 26
-            }
-            encryptedText += String.fromCharCode(value + keyTemp) 
-        }else if(value >= 97 && value <= 122){
-            if( (value + keyTemp) > 122){
-                keyTemp -= 26
-            }
-            encryptedText += String.fromCharCode(value + keyTemp) 
-        }else{
-            encryptedText += letter
-        }
+function encrypt(plainText, shift) {
+    var encryptedText = "";
+  
+    for (var i = 0; i < plainText.length; i++) {
+      var charCode = plainText.charCodeAt(i);
+  
+      // Se o caractere estiver em letra maiúscula
+      if (charCode >= 65 && charCode <= 90) {
+        encryptedText += String.fromCharCode(((charCode - 65 + shift) % 26) + 65);
       }
-      return encryptedText
-}
-
-let encryptedText = encrypText('Fala Zeze', 5)
-console.log(encryptedText)
-
-function decrypText(encryptedText){
-    for (let i = 0; i <= 26; i++) {
-        let sampleText = ''
-        for (let j = 0; j < encryptedText.length; j++) {
-            const letter = encryptedText.charAt(j);
-            const value = letter.codePointAt(0);
-            let key = i
-            if(value >= 65 && value <= 90){
-                if( (value + key) > 90){
-                    key -= 26
-                }
-                sampleText += String.fromCharCode(value + key) 
-            }else if(value >= 97 && value <= 122){
-                if( (value + key) > 122){
-                    key -= 26
-                }
-                sampleText += String.fromCharCode(value + key) 
-            }else{
-                sampleText += letter
-            }
-          }
-        console.log(sampleText)
+      // Se o caractere estiver em letra minúscula
+      else if (charCode >= 97 && charCode <= 122) {
+        encryptedText += String.fromCharCode(((charCode - 97 + shift) % 26) + 97);
       }
-}
+      // Se o caracter não for uma letra
+      else {
+        encryptedText += plainText.charAt(i);
+      }
+    }
+  
+    return encryptedText;
+  }
+  
+  function decrypt(encryptedText, shift) {
+    var decryptedText = "";
+  
+    for (var i = 0; i < encryptedText.length; i++) {
+      var charCode = encryptedText.charCodeAt(i);
+  
+      // Se o caractere estiver em letra maiúscula
+      if (charCode >= 65 && charCode <= 90) {
+        decryptedText += String.fromCharCode(((charCode - 65 - shift + 26) % 26) + 65);
+      }
+      // Se o caractere estiver em letra minúscula
+      else if (charCode >= 97 && charCode <= 122) {
+        decryptedText += String.fromCharCode(((charCode - 97 - shift + 26) % 26) + 97);
+      }
+      // Se o caracter não for uma letra
+      else {
+        decryptedText += encryptedText.charAt(i);
+      }
+    }
+  
+    return decryptedText;
+  }
+  
 
-decrypText(encryptedText)
-decrypText('cgrzm namfrzmnemzn unem namr fdnm namerzmnmv efdgpnamqrmgzmbdasveeva ny')
+let plainText = "teste da cifra de Cezar";
+let key = 5;
 
+let encryptedText = encrypt(plainText, key);
+console.log(encryptedText);
+
+let decryptedText = decrypt(encryptedText, key);
+console.log(decryptedText);
