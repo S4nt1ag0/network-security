@@ -5,7 +5,6 @@ from cryptography.hazmat.primitives.ciphers import (
     Cipher, algorithms, modes)
 import AesConfigs
 
-print(AesConfigs.iv)
 def encrypt(data):
     cipher = Cipher(
     algorithms.AES(AesConfigs.key),
@@ -17,18 +16,21 @@ def encrypt(data):
 HOST = sys.argv[1]             #host
 PORT = int(sys.argv[2])        #port
 plaintext = sys.argv[3]        #message
+
+while len(plaintext)%16 != 0:
+    plaintext += " "
+
 plaintext = plaintext.encode()
-x = encrypt(plaintext * 2)
-print(x)
+x = encrypt(plaintext)
+
 # definições do socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
 print('\nsocket bind to port: %s' % (PORT))
 
 # aguardando requisições
-s.listen(5)
+s.listen()
 print("socket is listening")
-print("set: 'ctrl + c' to kill server\n")
 
 try:
     while True:
