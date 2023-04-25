@@ -1,34 +1,15 @@
 import socket
-import sys
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.ciphers import (
-    Cipher, algorithms, modes)
 import AesConfigs
+import rsa
 
-def encrypt(data):
-    cipher = Cipher(
-    algorithms.AES(AesConfigs.key),
-    modes.CBC(AesConfigs.iv),
-    backend=default_backend())
-    encryptor = cipher.encryptor()
-    return (encryptor.update(data) + encryptor.finalize())
-
-HOST = sys.argv[1]             #host
-PORT = int(sys.argv[2])        #port
-plaintext = sys.argv[3]        #message
-
-while len(plaintext)%16 != 0:
-    plaintext += " "
-
-plaintext = plaintext.encode()
-x = encrypt(plaintext)
-
+#chave publica, privada
+publicKey, privateKey = rsa.newkeys(2048)
+BUFFER_SIZE = 1024
 # definições do socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((HOST, PORT))
-print('\nsocket bind to port: %s' % (PORT))
+s.bind((AesConfigs.host, AesConfigs.port))
+print('\nsocket bind to port: %s' % (AesConfigs.port))
 
-# aguardando requisições
 s.listen()
 print("socket is listening")
 
@@ -36,10 +17,30 @@ try:
     while True:
         # aceitando conexão com o client
         clientSocket, addr = s.accept()
-        print('[port: %s] new connection with client' % (addr[1]))
-        clientSocket.send(x)
+        print('[port: %s] new connection with client' % (AesConfigs.port))
+        clientSocket.send(publicKey.save_pkcs1())
+        keyForAes = clientSocket.recv(BUFFER_SIZE)
+        keyForAes = rsa.decrypt(keyForAes,privateKey)
+        ivForAes = clientSocket.recv(BUFFER_SIZE)
+        print(ivForAes)
+        ivForAes = rsa.decrypt(ivForAes,privateKey)
+        print(ivForAes)
+        encryptedText = clientSocket.recv(BUFFER_SIZE)
+        decryptedText = AesConfigs.decrypt(encryptedText, keyForAes, ivForAes).decode()
+        clientSocket.send('Tudo certo, texto descriptogrfado: '+ decryptedText).encode('utf-8')
+        clientSocket.close()
 except:
     pass
 finally:
-    print("SERVER OFF %s:%s" % (HOST, PORT))
+    print("SERVER OFF %s:%s" % (AesConfigs.host, AesConfigs.port))
     s.close()
+
+
+
+
+
+
+
+# aguardando requisições
+
+

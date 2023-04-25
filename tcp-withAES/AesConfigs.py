@@ -1,4 +1,22 @@
-import secrets
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import (
+    Cipher, algorithms, modes)
 
-key = b'key must be 128.'
-iv = b"\x8a'\xd8\xf59]\x157S[X\xc0t\xcb\xa2\xc8"
+host = 'localhost'
+port = 9098
+
+def encrypt(data, key, iv):
+    cipher = Cipher(
+    algorithms.AES(key),
+    modes.CBC(iv),
+    backend=default_backend())
+    encryptor = cipher.encryptor()
+    return (encryptor.update(data) + encryptor.finalize())
+
+def decrypt(data, key, iv):
+    cipher = Cipher(
+        algorithms.AES(key),
+        modes.CBC(iv),
+        backend=default_backend())
+    decryptor = cipher.decryptor()
+    return decryptor.update(data)
