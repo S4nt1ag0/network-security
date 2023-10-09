@@ -1,4 +1,7 @@
 import random
+from math import sqrt
+
+prime0to100 = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
 
 def mdc(a, b):
     if b == 0:
@@ -12,8 +15,17 @@ def mod_inverse(a, m):
             return x
     return -1
 
-def generateKeyPair(keysize = 16):
-    #configurando tamanho da chave, valores maximos, minimos e de onde começa e termina a geração.
+def is_prime(n):
+    root = sqrt(n)
+    for prime in prime0to100:
+        if prime > root:
+            return True
+        if n % prime == 0:
+            return False
+
+def generateKeyPair():
+    # configurando tamanho da chave, valores maximos, minimos e de onde começa e termina a geração.
+    keysize = 16
     nMin = 1 << (keysize - 1)
     nMax = (1 << keysize) - 1
     primos = [2]
@@ -21,20 +33,11 @@ def generateKeyPair(keysize = 16):
     end = 1 << (keysize // 2 + 1)
 
     #Selecionando todos os primos entre start e end.
-    for i in range(3, end + 1, 2):
-        isPrime = True
-        for p in primos:
-            if i % p == 0:
-                isPrime = False
-                break
-        if(isPrime):
+    for i in range(start+1, end + 1, 2):
+        if(is_prime(i)):
             primos.append(i)
 
-    #Excluindo os primos menores que o valor inicial
-    while (primos and primos[0] < start):
-        del primos[0]
-
-    #Dos primos restantes, seleciona um aleatorio para ser p, e outro para ser q, desde que p*q não seja maior que nMax
+    #Seleciona um primo aleatorio para ser p, e outro para ser q, desde que p*q não seja maior que nMax
     while primos:
         p = random.choice(primos)
         primos.remove(p)
@@ -47,7 +50,7 @@ def generateKeyPair(keysize = 16):
     n = p * q
     phi = (p - 1) * (q - 1)
 
-    #gera a chave publica e privada desde que mdc(e, phi) == 1 e 'e' != d
+    #Agora com 'p', 'q' e 'n' é a hora de gerar a chave publica e privada desde que mdc(e, phi) == 1 e 'e' != d
     while True:
         e = random.randrange(1, phi)
         g = mdc(e, phi)
